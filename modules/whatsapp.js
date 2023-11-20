@@ -1,6 +1,8 @@
 const qrcode = require('qrcode-terminal');
 const openai = require('./openai-assistants');
+require('dotenv').config();
 
+const assistantId = process.env.ASSISTANT_ID;
 
 const errorLog = (operation, error) => {
     console.log(`Error during ${operation}: ${error.message || error}\n`);
@@ -53,7 +55,7 @@ const whatsapp = {
             } else {
                 console.log('No sesion existing, creating a new one');
 
-                const assistant = await openai.assistants.retrieve('asst_gATYLXwr2ccD9pk8I9sPyCpz');
+                const assistant = await openai.assistants.retrieve(assistantId);
                 const thread = await openai.threads.create();
                 const newSession = {
                     userId: userId,
