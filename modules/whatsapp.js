@@ -1,4 +1,6 @@
 const qrcode = require('qrcode-terminal');
+const openai = require('./openai-assistants');
+
 
 const errorLog = (operation, error) => {
     console.log(`Error during ${operation}: ${error.message || error}\n`);
@@ -50,10 +52,12 @@ const whatsapp = {
     
             } else {
                 console.log('No sesion existing, creating a new one');
-    
-                const thread = 'New thread created'; // await threads.create();
+
+                const assistant = await openai.assistants.retrieve('asst_gATYLXwr2ccD9pk8I9sPyCpz');
+                const thread = await openai.threads.create();
                 const newSession = {
                     userId: userId,
+                    assistant: assistant,
                     thread: thread,
                     messages: [
                         { user: msg.body },
@@ -63,7 +67,7 @@ const whatsapp = {
                 return newSession;
             }  
         } catch (error) {
-            errorLog('Processing sessions', error);
+            errorLog('processing sessions', error);
         }
     }
 }

@@ -1,22 +1,22 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const client = new Client({ authStrategy: new LocalAuth() });
-
 const whatsapp = require('../modules/whatsapp');
-const chatCompletion = require('../modules/chat-completion');
+const assistantResponse = require('../modules/assistant-logic');
 const fs = require('fs');
 
 let sessions = []
 
 
+
 async function listener() {
-
+    
     client.on('message', async (msg) => {
-
+        
         const session = await whatsapp.sessionHandler(sessions, msg);
-
+        
         const userMessage = msg.body;
         
-        const response = await chatCompletion(userMessage); // assistantResponse(userMessage);
+        const response = await assistantResponse(session, userMessage);
 
         session.messages.push({system: response});
 
@@ -29,7 +29,7 @@ async function listener() {
 
 
 
-async function main() {
+async function botInit() {
 
     await whatsapp.init(client);
 
@@ -37,4 +37,4 @@ async function main() {
 
 }
 
-main();
+botInit();
