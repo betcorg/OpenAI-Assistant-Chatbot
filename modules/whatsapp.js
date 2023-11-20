@@ -1,5 +1,18 @@
 const qrcode = require('qrcode-terminal');
 
+const errorLog = (operation, error) => {
+    console.log(`Error during ${operation}: ${error.message || error}\n`);
+};
+
+
+async function isSessionActive(sessions, userId) {
+    let active = false;
+    for (const session of sessions) {
+        if (session.userId.includes(userId)) active = true;
+    }
+    return active;
+}
+
 const whatsapp = {
 
     init: async (client) => {
@@ -12,7 +25,45 @@ const whatsapp = {
             });
             await client.initialize();
         } catch (error) {
-            console.log('Error during initializing whatsapp client: ', error.message || error);
+            errorLog('initializing WhatsApp client', error);
+        }
+    },
+
+    sessionHandler: async (sessions, msg) => {
+
+        const userId =  msg.from.toString().match(/\d+/g)[0];
+
+        const existingSession = await isSessionActive(sessions, userId);
+        try {
+            if (existingSession) {
+                console.log('existing session');
+                let updatedSession = {};
+                for (const session of sessions) {
+                    if (session.userId === userId) {
+                        updatedSession = session;
+                        sessions = sessions.filter(elem => elem !== session);
+                        updatedSession.messages.push({ user: msg.body });
+                        sessions.push(updatedSession);
+                    }
+                }
+                return updatedSession;
+    
+            } else {
+                console.log('No sesion existing, creating a new one');
+    
+                const thread = 'New thread created'; // await threads.create();
+                const newSession = {
+                    userId: userId,
+                    thread: thread,
+                    messages: [
+                        { user: msg.body },
+                    ],
+                }
+                sessions.push(newSession);
+                return newSession;
+            }  
+        } catch (error) {
+            errorLog('Processing sessions', error);
         }
     }
 }
