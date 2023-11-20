@@ -17,7 +17,7 @@ async function chatCompletion(userText) {
         return completion.choices[0].message.content;
 
     } catch (error) {
-        console.log('Error while creating chat completion', error);
+        console.log('Error while creating chat completion\n', error.message);
     }
 
 }

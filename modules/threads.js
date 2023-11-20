@@ -6,7 +6,7 @@ const errorLog = (operation, error) => {
 };
 
 const threads = {
-    // Creates a new thread
+    // Creates a new thread with optional message
     create: async (messages) => {
         try {
             return await openai.beta.threads.create(messages);
