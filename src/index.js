@@ -6,14 +6,14 @@ const fs = require('fs');
 const date = new Date;
 
 
-let sessions = []
-
-
+let sessions = [];
 
 async function listener() {
     
     client.on('message', async (msg) => {
+        console.log(`User message:
         
+        ${msg.body}\n`);
         const session = await whatsapp.sessionHandler(sessions, msg);
         const userMessage = msg.body;
         const response = await assistantResponse(session, userMessage);
@@ -26,12 +26,11 @@ async function listener() {
 
 async function botInit() {
 
-    fs.writeFileSync(`sessions-complete/sessions${date.getTime()}.json`, 'sessions/sessions.json', 'utf-8');
+    fs.writeFileSync(`sessions-complete/sessions${date.getTime()}.json`, fs.readFileSync('sessions/sessions.json'));
 
     await whatsapp.init(client);
 
     await listener();
-
 }
 
 botInit();

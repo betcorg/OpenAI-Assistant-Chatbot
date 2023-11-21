@@ -25,7 +25,7 @@ const whatsapp = {
                 qrcode.generate(qr, { small: true });
             });
             await client.on('ready', () => {
-                console.log('WhatsApp client is ready!');
+                console.log('WhatsApp client is ready!\n');
             });
             await client.initialize();
         } catch (error) {
@@ -40,7 +40,7 @@ const whatsapp = {
         const existingSession = await isSessionActive(sessions, userId);
         try {
             if (existingSession) {
-                console.log('existing session');
+                console.log('Active session\n');
                 let updatedSession = {};
                 for (const session of sessions) {
                     if (session.userId === userId) {
@@ -53,16 +53,16 @@ const whatsapp = {
                 return updatedSession;
     
             } else {
-                console.log('No sesion existing, creating a new one');
+                console.log('Creating a new sessions\n');
 
                 const assistant = await openai.assistants.retrieve(assistantId);
                 const thread = await openai.threads.create();
                 const newSession = {
-                    userId: userId,
-                    assistant: assistant,
-                    thread: thread,
-                    messages: [
-                        { user: msg.body },
+                    "userId": userId,
+                    "assistant": assistant,
+                    "thread": thread,
+                    "messages": [
+                        { "user": msg.body },
                     ],
                 }
                 sessions.push(newSession);
