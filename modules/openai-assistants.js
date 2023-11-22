@@ -263,12 +263,58 @@ const fileman = {
     },
 };
 
+
+/*/////////////////////////////// SESSION MANAGER /////////////////////////////////*/
+
+
+const session = {
+    
+    create: async (userId, userMessage, sessions) => {
+        try {
+            const assistantId = process.env.ASSISTANT_ID;
+            const assistant = await assistants.retrieve(assistantId);
+            const thread = await threads.create();
+            const newSession = {
+                "userId": userId,
+                "assistant": assistant,
+                "thread": thread,
+                "runs": [],
+                "messages": [
+                    { "user": userMessage },
+                ],
+            }
+            sessions.push(newSession);
+            return newSession;
+        } catch (error) {
+            errorLog('creating a new session', error);
+        }
+    },
+
+    update: async (userId, userMessage, sessions) => {
+        try {
+            let updatedSession = {};
+            for (const session of sessions) {
+                if (session.userId === userId) {
+                    updatedSession = session;
+                    sessions = sessions.filter(elem => elem !== session);
+                    updatedSession.messages.push({ "user": userMessage });
+                    sessions.push(updatedSession);
+                }
+            }
+            return updatedSession;
+        } catch (error) {
+            errorLog('updating sessions', error);
+        }
+    }
+}
+
 module.exports = {
     assistants,
     threads,
     messages,
     runs,
     fileman,
+    session,
 };
 
 

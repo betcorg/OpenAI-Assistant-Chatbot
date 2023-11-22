@@ -8,7 +8,7 @@ async function chatCompletion(userText) {
             { role: "system", content: "Eres un asistente muy útil" },
             { role: "user", content: userText },
         ],
-        model: "gpt-3.5-turbo",
+        model: "gpt-3.5-turbo-1106",
         max_tokens: 150,
     }
     
