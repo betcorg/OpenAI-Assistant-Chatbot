@@ -33,21 +33,19 @@ const whatsapp = {
         }
     },
 
-    sessionHandler: async (sessions, msg) => {
-
-        const userId = msg.from.toString().match(/\d+/g)[0];
-
+    sessionHandler: async (sessions, message) => {
+        
+        const userId = message.from.toString().match(/\d+/g)[0];
         const existingSession = await isSessionActive(sessions, userId);
 
         if (existingSession) {
             console.log('Active session\n');
-            return await openai.session.update(userId, msg.body, sessions);
+            return await openai.session.update(userId, message, sessions);
 
         } else {
             console.log('Creating a new sessions\n');
-            return await openai.session.create(userId, msg.body, sessions); 
+            return await openai.session.create(userId, message, sessions); 
         }
-
     }
 }
 

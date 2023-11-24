@@ -1,12 +1,12 @@
 const OpenAI = require('openai');
 const openai = new OpenAI();
 
-async function chatCompletion(userText) {
+async function chatCompletion(userMessage) {
 
     const params = {
         messages: [
             { role: "system", content: "Eres un asistente muy útil" },
-            { role: "user", content: userText },
+            { role: "user", content: userMessage },
         ],
         model: "gpt-3.5-turbo-1106",
         max_tokens: 150,

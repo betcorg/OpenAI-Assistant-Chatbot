@@ -17,6 +17,7 @@ async function assistantResponse(session, userMessage) {
         currentRun = await openai.runs.retrieve(thread.id, run.id);
         console.log('Processing answer...\n');
     }
+
     // Extract text from the last assistant response
     const messageList = await openai.messages.list(thread.id);
     fs.writeFileSync(`messages/message-list-${session.userId}.json`, JSON.stringify(messageList));
@@ -29,21 +30,14 @@ async function assistantResponse(session, userMessage) {
 
     // Obtain annotations from the response and elminate them if they exist. 
     let annotations = lastMessage.content[0].text.annotations[0];
-
+    
     if (typeof (annotations) === 'undefined' && response) {
-        console.log(`Response:
-
-        ${response}\n`);
+        console.log(`Response: ${response}\n`);
         return response;
     } else {
         response = response.replace(annotations.text, '');
-        console.log(`Response:
-
-        ${response}
-        
-        Annotations: 
-        
-        ${annotations.text}\n`);
+        console.log(`Response: ${response}\n
+        Annotations: ${annotations.text}\n`);
         return response;
     }
 }

@@ -2,7 +2,6 @@ const OpenAI = require('openai');
 const openai = new OpenAI();
 const fs = require('fs');
 
-
 const errorLog = (operation, error) => {
     console.log(`Error during ${operation}: ${error.message || error}\n`);
 };
@@ -149,7 +148,7 @@ const messages = {
         try {
             return await openai.beta.threads.messages.update(
                 "thread_abc123",
-                "msg_abc123",
+                "message_abc123",
                 {
                     metadata: {
                         modified: "true",
@@ -269,18 +268,19 @@ const fileman = {
 
 const session = {
     
-    create: async (userId, userMessage, sessions) => {
+    create: async (userId, message, sessions) => {
         try {
             const assistantId = process.env.ASSISTANT_ID;
             const assistant = await assistants.retrieve(assistantId);
             const thread = await threads.create();
             const newSession = {
                 "userId": userId,
+                "from": message.from,
                 "assistant": assistant,
                 "thread": thread,
                 "runs": [],
                 "messages": [
-                    { "user": userMessage },
+                    { "user": message.body },
                 ],
             }
             sessions.push(newSession);
@@ -290,14 +290,14 @@ const session = {
         }
     },
 
-    update: async (userId, userMessage, sessions) => {
+    update: async (userId, message, sessions) => {
         try {
             let updatedSession = {};
             for (const session of sessions) {
                 if (session.userId === userId) {
                     updatedSession = session;
                     sessions = sessions.filter(elem => elem !== session);
-                    updatedSession.messages.push({ "user": userMessage });
+                    updatedSession.messages.push({ "user": message.body });
                     sessions.push(updatedSession);
                 }
             }
