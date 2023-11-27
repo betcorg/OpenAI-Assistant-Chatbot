@@ -1,5 +1,4 @@
-const OpenAI = require('openai');
-const openai = new OpenAI();
+const chatCompletion = require('../modules/chat-completion');
 const readline = require("readline").createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -20,16 +19,8 @@ async function main() {
     let keepAsking = true;
     while (keepAsking) {
         const userQuestion = await askQuestion("\n>>> ");
-        const completion = await openai.chat.completions.create({
-            messages: [
-                { role: "system", content: "Eres un asistente genial" },
-                { role: "user", content: userQuestion },
-            ],
-            model: "gpt-3.5-turbo",
-            max_tokens: 250,
-        });
-
-        console.log('\n'+completion.choices[0].message.content);
+        const completion = await chatCompletion(userQuestion);
+        console.log(completion);
     }
 }
 main();
