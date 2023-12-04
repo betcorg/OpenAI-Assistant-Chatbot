@@ -1,6 +1,12 @@
+/* The above code is a module that provides functions for interacting with the OpenAI API.
+It includes functions for chat completion, creating and managing assistants, creating and managing
+threads, creating and managing messages, creating and managing runs, uploading files, and managing
+sessions. The code exports these functions so that they can be used in other JavaScript files. */
 const OpenAI = require('openai');
 const openai = new OpenAI();
 const fs = require('fs');
+require('dotenv').config();
+
 
 const errorLog = (operation, error) => {
     console.log(`Error during ${operation}: ${error.message || error}\n`);
@@ -8,67 +14,39 @@ const errorLog = (operation, error) => {
 
 
 
-/*/////////////////////////////// ASSISTANTS /////////////////////////////////*/
+/*/////////////////////////////// CHAT COMPLETION/////////////////////////////////*/
 
 
 
-const assistants = {
+const chat = {
+    completion: async (instructions, userMessage) => {
+        
+        const MODEL = process.env.MODEL;
+        const MAX_TOKENS = parseInt(process.env.MAX_TOKENS);
 
-    // Creates new Assistant
-    create: async (params) => {
-        try {
-            return await openai.beta.assistants.create(params);
-        } catch (error) {
-            errorLog('creating a new assistant', error);
+        const params = {
+            messages: [
+                { role: "system", content: instructions },
+                { role: "user", content: userMessage },
+            ],
+            model: MODEL,
+            max_tokens: MAX_TOKENS,
         }
-    },
 
-    // Retrieves an existing assistant by the id
-    retrieve: async (assistantId) => {
         try {
-            return await openai.beta.assistants.retrieve(assistantId);
-        } catch (error) {
-            errorLog('retrieving an assistant', error);
-        }
-    },
+            const completion = await openai.chat.completions.create(params);
+            return completion.choices[0].message.content;
 
-    // Updates an assistant
-    update: async (id, params) => {
-        try {
-            return await openai.beta.assistants.update(
-                id,
-                params,
-            );
         } catch (error) {
-            errorLog('updating an assistant', error);
+            console.log('Error while creating chat completion\n', error.message);
         }
-    },
 
-    // Deletes an assistant by its id
-    delete: async (assistantId) => {
-        try {
-            return await openai.beta.assistants.del(assistantId);
-        } catch (error) {
-            errorLog('deleting an assistant', error);
-        }
-    },
-
-    // List existing assistants
-    list: async () => {
-        try {
-            return await openai.beta.assistants.list({
-                order: "desc",
-                limit: "20",
-            });
-        } catch (error) {
-            errorLog('listing assistants', error);
-        }
-    },
+    }
 }
 
 
 
-/*////////////////////////////// THREADS //////////////////////////////////*/
+/*/////////////////////////////////////// THREADS ///////////////////////////////////////*/
 
 
 
@@ -213,7 +191,7 @@ const runs = {
                 "run_abc123",
                 {
                     metadata: {
-                    user_id: "user_abc123",
+                        user_id: "user_abc123",
                     },
                 });
         } catch (error) {
@@ -223,16 +201,115 @@ const runs = {
 
     // Lists runs attaches¡d to a thread
     list: async (threadId) => {
-            try {
-                return await openai.beta.threads.runs.list(
-                    threadId,
-                );
-            } catch (error) {
-                errorLog('listing run', error);
-            }
+        try {
+            return await openai.beta.threads.runs.list(
+                threadId,
+            );
+        } catch (error) {
+            errorLog('listing run', error);
+        }
     },
 }
 
+
+
+/*////////////////////////////// ASSISTANTS //////////////////////////////////*/
+
+
+
+const assistants = {
+
+    // Creates new Assistant
+    create: async (params) => {
+        try {
+            return await openai.beta.assistants.create(params);
+        } catch (error) {
+            errorLog('creating a new assistant', error);
+        }
+    },
+
+    // Retrieves an existing assistant by the id
+    retrieve: async (assistantId) => {
+        try {
+            return await openai.beta.assistants.retrieve(assistantId);
+        } catch (error) {
+            errorLog('retrieving an assistant', error);
+        }
+    },
+
+    // Updates an assistant
+    update: async (id, params) => {
+        try {
+            return await openai.beta.assistants.update(
+                id,
+                params,
+            );
+        } catch (error) {
+            errorLog('updating an assistant', error);
+        }
+    },
+
+    // Deletes an assistant by its id
+    delete: async (assistantId) => {
+        try {
+            return await openai.beta.assistants.del(assistantId);
+        } catch (error) {
+            errorLog('deleting an assistant', error);
+        }
+    },
+
+    // List existing assistants
+    list: async () => {
+        try {
+            return await openai.beta.assistants.list({
+                order: "desc",
+                limit: "20",
+            });
+        } catch (error) {
+            errorLog('listing assistants', error);
+        }
+    },
+
+    response: async (session, userMessage) => {
+        try {
+            // Create a new message attached to a thread and then create a run from current thread
+            const assistant = await session.assistant;
+            const thread = await session.thread;
+            await messages.create(thread.id, userMessage);
+            const run = await runs.create(thread.id, assistant.id);
+            session.runs.push(run);
+
+            // Polling mechanism
+            let currentRun = await runs.retrieve(thread.id, run.id);
+            while (currentRun.status !== "completed") {
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                currentRun = await openai.runs.retrieve(thread.id, run.id);
+                console.log('Processing answer...\n');
+            }
+
+            // Extract text from the last assistant response
+            const messageList = await messages.list(thread.id);
+            const lastMessage = await messageList.data
+                .filter((message) =>
+                    message.run_id === run.id
+                    && message.role === "assistant"
+                ).pop();
+            let response = lastMessage.content[0].text.value;
+
+            // Obtain annotations from the response and elminate them if they exist. 
+            let annotations = lastMessage.content[0].text.annotations[0];
+
+            if (typeof (annotations) === 'undefined' && response) {
+                return response;
+            } else {
+                response = response.replace(annotations.text, '');
+                return response;
+            }
+        } catch (error) {
+            errorLog('creating an assistant response', error);
+        }
+    },
+}
 
 
 /*/////////////////////////////// FILE MANAGER /////////////////////////////////*/
@@ -267,7 +344,7 @@ const fileman = {
 
 
 const session = {
-    
+
     create: async (userId, message, sessions) => {
         try {
             const assistantId = process.env.ASSISTANT_ID;
@@ -309,10 +386,11 @@ const session = {
 }
 
 module.exports = {
-    assistants,
+    chat,
     threads,
     messages,
     runs,
+    assistants,
     fileman,
     session,
 };
