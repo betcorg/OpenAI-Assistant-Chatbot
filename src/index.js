@@ -1,5 +1,5 @@
 const express = require('express');
-const waRouter = require('./src/routes/wa-router');
+const waRouter = require('./routes/wa-router');
 require('dotenv').config();
 
 const app = express();
