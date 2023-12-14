@@ -26,12 +26,12 @@ const chat = {
 
         const params = {
             messages: [
-                { role: "system", content: instructions },
-                { role: "user", content: userMessage },
+                { role: 'system', content: instructions },
+                { role: 'user', content: userMessage },
             ],
             model: MODEL,
             max_tokens: MAX_TOKENS,
-        }
+        };
 
         try {
             const completion = await openai.chat.completions.create(params);
@@ -42,7 +42,7 @@ const chat = {
         }
 
     }
-}
+};
 
 
 
@@ -89,7 +89,7 @@ const threads = {
             errorLog('deleting a thread', error);
         }
     },
-}
+};
 
 
 
@@ -103,7 +103,7 @@ const messages = {
         try {
             return await openai.beta.threads.messages.create(
                 threadId,
-                { role: "user", content: messages },
+                { role: 'user', content: messages },
             );
         } catch (error) {
             errorLog('creating a message', error);
@@ -125,15 +125,16 @@ const messages = {
     update: async () => {
         try {
             return await openai.beta.threads.messages.update(
-                "thread_abc123",
-                "message_abc123",
+                'thread_abc123',
+                'message_abc123',
                 {
-                    metadata: {
-                        modified: "true",
-                        user: "abc123",
+                    metadata: 
+                    {
+                        modified: 'true',
+                        user: 'abc123',
                     },
                 }
-            )
+            );
         } catch (error) {
             errorLog('updating message', error);
         }
@@ -149,7 +150,7 @@ const messages = {
             errorLog('listing messages', error);
         }
     }
-}
+};
 
 
 
@@ -187,11 +188,11 @@ const runs = {
     update: async () => {
         try {
             return await openai.beta.threads.runs.update(
-                "thread_abc123",
-                "run_abc123",
+                'thread_abc123',
+                'run_abc123',
                 {
                     metadata: {
-                        user_id: "user_abc123",
+                        user_id: 'user_abc123',
                     },
                 });
         } catch (error) {
@@ -209,7 +210,7 @@ const runs = {
             errorLog('listing run', error);
         }
     },
-}
+};
 
 
 
@@ -262,8 +263,8 @@ const assistants = {
     list: async () => {
         try {
             return await openai.beta.assistants.list({
-                order: "desc",
-                limit: "20",
+                order: 'desc',
+                limit: '20',
             });
         } catch (error) {
             errorLog('listing assistants', error);
@@ -281,7 +282,7 @@ const assistants = {
 
             // Polling mechanism
             let currentRun = await runs.retrieve(thread.id, run.id);
-            while (currentRun.status !== "completed") {
+            while (currentRun.status !== 'completed') {
                 await new Promise((resolve) => setTimeout(resolve, 2000));
                 currentRun = await openai.runs.retrieve(thread.id, run.id);
                 console.log('Processing answer...\n');
@@ -292,7 +293,7 @@ const assistants = {
             const lastMessage = await messageList.data
                 .filter((message) =>
                     message.run_id === run.id
-                    && message.role === "assistant"
+                    && message.role === 'assistant'
                 ).pop();
             let response = lastMessage.content[0].text.value;
 
@@ -309,7 +310,7 @@ const assistants = {
             errorLog('creating an assistant response', error);
         }
     },
-}
+};
 
 
 /*/////////////////////////////// FILE MANAGER /////////////////////////////////*/
@@ -322,10 +323,10 @@ const fileman = {
         try {
             return await openai.files.create({
                 file: fs.createReadStream(filePath),
-                purpose: "assistants",
+                purpose: 'assistants',
             });
         } catch (error) {
-            errorLog("uploading file", error);
+            errorLog('uploading file', error);
         }
     },
 
@@ -334,7 +335,7 @@ const fileman = {
         try {
             return await openai.files.list();
         } catch (error) {
-            errorLog("listing files", error);
+            errorLog('listing files', error);
         }
     },
 };
@@ -351,15 +352,15 @@ const session = {
             const assistant = await assistants.retrieve(assistantId);
             const thread = await threads.create();
             const newSession = {
-                "userId": userId,
-                "from": message.from,
-                "assistant": assistant,
-                "thread": thread,
-                "runs": [],
-                "messages": [
-                    { "user": message.body },
+                'userId': userId,
+                'from': message.from,
+                'assistant': assistant,
+                'thread': thread,
+                'runs': [],
+                'messages': [
+                    { 'user': message.body },
                 ],
-            }
+            };
             sessions.push(newSession);
             return newSession;
         } catch (error) {
@@ -374,7 +375,7 @@ const session = {
                 if (session.userId === userId) {
                     updatedSession = session;
                     sessions = sessions.filter(elem => elem !== session);
-                    updatedSession.messages.push({ "user": message.body });
+                    updatedSession.messages.push({ 'user': message.body });
                     sessions.push(updatedSession);
                 }
             }
@@ -383,7 +384,7 @@ const session = {
             errorLog('updating sessions', error);
         }
     }
-}
+};
 
 module.exports = {
     chat,
@@ -394,6 +395,5 @@ module.exports = {
     fileman,
     session,
 };
-
 
 
