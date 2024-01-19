@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import { RiSendPlane2Fill } from "react-icons/ri";
-import Header from "../components/ChatHeader";
+import Header from "./ChatHeader";
 
 // const url = '/api';
 
@@ -25,7 +25,7 @@ const UserMessage = (props) => {
     );
 };
 
-const ChatScreen = () => {
+const ChatBox = () => {
     const [inputValue, setInputValue] = useState("");
     const [messageBox, setMessageBox] = useState([]);
     const [query, setQuery] = useState("");
@@ -67,7 +67,7 @@ const ChatScreen = () => {
     ))
 
     return (
-        <div className="flex h-screen items-center justify-center">
+        <div className="flex h-screen w-full items-center justify-center">
             <div className="h-full w-full mx-auto">
                 {/* HEADER */}
                 <Header />
@@ -83,14 +83,14 @@ const ChatScreen = () => {
                     </div>
 
                     {/* Text input */}
-                    <div className="h-14 flex justify-center items-center p-2">
+                    <div className="h-14 w-full flex justify-center items-center p-2">
                         <div className="flex items-center justify-center w-full">
                             <form
-                                className="flex items-center gap-2"
+                                className="w-full flex items-center justify-center gap-2"
                                 onSubmit={handleSubmit}
                             >
                                 <textarea
-                                    className="w-[80vw] h-10 rounded-full p-2"
+                                    className="w-[90%] h-10 rounded-md p-2 outline-none"
                                     onChange={handleChange}
                                     value={inputValue}
                                 ></textarea>
@@ -110,4 +110,4 @@ const ChatScreen = () => {
     );
 };
 
-export default ChatScreen;
+export default ChatBox;

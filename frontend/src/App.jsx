@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ChatScreen from "./screens/ChatScreen";
+import Home from "./screens/Home";
 import Login from "./screens/Login";
-import Register from "./screens/Register";
+import Signup from "./screens/Signup";
+import Assistant from "./screens/AssistantChat";
 
 
 
@@ -10,9 +11,10 @@ const App = () => {
         <>
             <Router>
                 <Routes>
-                    <Route path="/" element={<ChatScreen />} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/assistant" element={<Assistant />} />
                 </Routes>
             </Router>
         </>
