@@ -14,7 +14,7 @@ const { verifyToken } = require('../middleware/verifyToken');
 router
     .get('/profile', verifyToken, routesController.profile);
 
-    
+
 const usersController = require('../controllers/v1/users');
 router
     .get('/users', usersController.getUsers)
@@ -25,13 +25,22 @@ router
 
 const assistsController = require('../controllers/v1/assistants');
 router
-    .get('/assistants/:user_id/', assistsController.listAssistants)
-    .get('/assistants/:user_id/:assistant_id', assistsController.getAssistantById)
-    .post('/assistants/:user_id', assistsController.createNewAssistant)
-    .put('/assistants/:user_id/:assistant_id', assistsController.updateAssistantById)
-    .delete('/assistants/:user_id/:assistant_id', assistsController.deleteAssistantById)
+    .get('/assistants/list', assistsController.listAssistants)
+    .get('/assistants/retrieve', assistsController.getAssistantById)
+    .post('/assistants/create', assistsController.createNewAssistant)
+    .put('/assistants/update', assistsController.updateAssistantById)
+    .delete('/assistants/delete', assistsController.deleteAssistantById)
 
-    .post('/assistants/use/:assistant_id', assistsController.useAssistant);
+    .post('/assistants/use', assistsController.useAssistant);
+
+
+
+const path = require('path');
+const multer = require('multer');
+const upload = multer({ dest: path.join(__dirname, '../../pdfsummary') });
+const { pdfSummary } = require('../controllers/v1/pdfSummary');
+
+router.post('/pdfsummary', upload.single('pdf'), pdfSummary);
 
 
 

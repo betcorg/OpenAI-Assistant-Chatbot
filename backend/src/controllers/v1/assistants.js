@@ -1,6 +1,6 @@
 const openai = require('../../services/openai');
 const User = require('../../database/schema/user-schema');
-const initAssistantChatbot = require('../../modules/bot_assistants');
+const {getAssistantResponse} = require('../../chatbots/assistants/gpt-assistants');
 
 const listAssistants = async (res) => {
 
@@ -75,7 +75,6 @@ const createNewAssistant = async (req, res) => {
         res.status(500).json({ error: error.message });
         console.log('cannot create assistant: ', error);
     }
-
 };
 
 const updateAssistantById = async (req, res) => {
@@ -115,9 +114,9 @@ const deleteAssistantById = async (req, res) => {
         const assistant_id = req.params.assistant_id;
 
         await User.findByIdAndUpdate(
-            user_id, // the document/user id to be updated
-            { $pull: { chatbots: { name: assistant_id } } }, // Deletes the new assistant id to the user's chatbots array
-            { new: true }, // returns the new document/user with the updated chatbots array
+            user_id, 
+            { $pull: { chatbots: { name: assistant_id } } }, 
+            { new: true }, 
         );
         res.status(204).json();
 
@@ -131,15 +130,10 @@ const deleteAssistantById = async (req, res) => {
 const useAssistant = async (req) => {
     console.log(req.body);
 
-    const assistant_id = req.params.user_id;
 
-    const { 
-        user_id,
-        user_message,
-    } = req.body;
+    await getAssistantResponse();
+   
 
-
-    await initAssistantChatbot(user_id, assistant_id, user_message);
 };
 
 

@@ -1,5 +1,5 @@
 const openai = require('../../services/openai');
-const errorLog = require('../../utils/error-handler');
+const errorLog = require('../../utils/secManager');
 
 
 const isSessionActive = async (sessions, userId) => {
@@ -10,7 +10,7 @@ const isSessionActive = async (sessions, userId) => {
     return active;
 };
 
-const createSession =  async (userId, message, sessions) => {
+const createSession = async (userId, message, sessions) => {
     try {
         const assistantId = process.env.ASSISTANT_ID;
         const assistant = await openai.assistants.retrieve(assistantId);
@@ -64,4 +64,6 @@ const sessionHandler = async (sessions, message) => {
     }
 };
 
-module.exports = { sessionHandler };
+module.exports = { 
+    sessionHandler,
+};

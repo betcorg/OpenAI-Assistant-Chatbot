@@ -3,7 +3,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { router } = require('../routes/');
+const { router } = require('../routes');
 const PORT = process.env.PORT;
 
 const expressApp = () => {

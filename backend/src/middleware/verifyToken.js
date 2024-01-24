@@ -1,6 +1,6 @@
 const {verifyJWT} = require('../utils/secManager');
 
-const tokenVerify = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
 
     const {token} = req.cookies;
     
@@ -18,5 +18,5 @@ const tokenVerify = async (req, res, next) => {
 };
 
 module.exports = {
-    tokenVerify
+    verifyToken,
 };
