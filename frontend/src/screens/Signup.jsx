@@ -1,7 +1,10 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import axios from "axios";
+import { useAuth } from "../context/AuthContext";
+import { useEffect } from "react";
+import {useNavigate} from "react-router-dom"
 
 const Signup = () => {
+
     let usernameError = false;
     let emailError = false;
     let passwordError = false;
@@ -10,15 +13,15 @@ const Signup = () => {
         username: "",
         email: "",
         password: ""
-    }
+    };
 
     const validateUsername = (value) => {
         let error;
         if (!value) {
             error = "Nombre de usuario requerido";
             usernameError = true;
-        } else if (!/^[a-zA-Z0-9]+$/.test(value)) {
-            error = "Tu nombre de usuario sólo puede tener letras y números";
+        } else if (!/^[a-zA-Z0-9._@-]+$/.test(value)) {
+            error = `Sólo se permiten letras, números o: [ @ _ - ]`;
             usernameError = true;
         } else {
             usernameError = false;
@@ -55,34 +58,37 @@ const Signup = () => {
         return error;
     };
 
-    const handleSubmit = async (values) => {
+    const {signupReq, isAuthenticated} = useAuth();
+    const navigate = useNavigate();
 
-        const data = {
-            username: values.username,
-            email: values.email,
-            password: values.password,
-        };
+   useEffect(() => {
 
-        const config = {
-            method: "post",
-            url: "http://localhost:3000/api/v1/signup",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            data
-        };
+    if (isAuthenticated) {
+        navigate('/assistant');
+    }
+   }, [isAuthenticated])
+
+    const handleSubmit = async (values, { setFieldError }) => {
+
         try {
-            const response = await axios(config);
-            console.log(response.data);
 
+            const data = {
+                username: values.username,
+                email: values.email,
+                password: values.password
+            };
+    
+            signupReq(data);
+            
         } catch (error) {
-            console.log(error.response.data.message);
+            
+            if (error.response) setFieldError('submit', error.response.data.message);
+            // console.log(error.response.data.message);
         }
 
-    }
+    };
 
-
-return (
+    return (
         <>
             <div className="bg-slate-50 h-screen flex items-center justify-center">
                 <div className="bg-white h-[450px] w-[400px] rounded-xl shadow-xl p-4">
@@ -100,11 +106,7 @@ return (
                             initialValues={initialValues}
                             onSubmit={handleSubmit}
                         >
-                            {({
-                                isSubmitting,
-                                errors,
-                                touched,
-                            }) => (
+                            {({ isSubmitting, errors, touched }) => (
                                 <Form>
                                     <Field
                                         type="username"
@@ -119,8 +121,8 @@ return (
                                                 : "border-slate-300"
                                         } ${
                                             usernameError
-                                            ? 'text-red-400'
-                                            : 'text-green-400'
+                                                ? "text-red-400"
+                                                : "text-green-400"
                                         }`}
                                     />
                                     <ErrorMessage
@@ -141,8 +143,8 @@ return (
                                                 : "border-slate-300"
                                         } ${
                                             emailError
-                                            ? 'text-red-400'
-                                            : 'text-green-400'
+                                                ? "text-red-400"
+                                                : "text-green-400"
                                         }`}
                                     />
                                     <ErrorMessage
@@ -183,6 +185,23 @@ return (
                                 </Form>
                             )}
                         </Formik>
+                        <div>
+                            <p className="text-center my-2 text-sm">
+                                ¿Ya tienes cuenta?{" "}
+                                <a href="/login" className="text-blue-500">
+                                    Iniciar sesión
+                                </a>
+                            </p>
+                            {/* <p className="text-center my-2 text-sm">
+                                ¿Olvidaste tu contraseña?{" "}
+                                <a
+                                    href="/forgotpassword"
+                                    className="text-blue-500"
+                                >
+                                    Recuperar contraseña
+                                </a>
+                            </p> */}
+                        </div>
                     </div>
                 </div>
             </div>

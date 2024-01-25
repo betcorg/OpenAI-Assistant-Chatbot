@@ -1,5 +1,5 @@
-import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { loginRequest } from "../api/authEndpoints";
 
 const Login = () => {
     let emailError = false;
@@ -41,23 +41,7 @@ const Login = () => {
             email: values.email,
             password: values.password
         };
-
-        const config = {
-            method: "post",
-            url: "http://localhost:3000/api/v1/login",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            data
-        };
-
-        const response = await axios(config);
-
-        console.log(response.data);
-
-        if (response.status === 200) {
-            console.log();
-        }
+        await loginRequest(data);
 
         setSubmitting(false);
     }
@@ -136,7 +120,7 @@ const Login = () => {
                             </Formik>
                         </div>
 
-                        <div className="">
+                        <div>
                             <p className="text-center my-2 text-sm">
                                 ¿Aún no tienes cuenta?{" "}
                                 <a href="/signup" className="text-blue-500">
