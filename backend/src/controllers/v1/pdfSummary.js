@@ -7,6 +7,8 @@ const pdfSummary = async (req, res) => {
 
     try {
         const { maxWords, model} = req.body;
+        console.log(req.body);
+        
         const pdfFile = req.file;
         const pdfText = await pdfTextExtractor(pdfFile.path);
 
@@ -15,6 +17,7 @@ const pdfSummary = async (req, res) => {
         }
 
         const summarisedText = await textSummariser(pdfText, maxWords, model);
+        console.log('[*] Summary done');
 
         res.status(200).json({ summarisedText });
 

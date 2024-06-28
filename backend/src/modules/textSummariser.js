@@ -4,33 +4,41 @@ const gemini = require('../services/gemini');
 
 let requests = 0;
 const ChunkSize = 4000;
+let currentModel = 'gemini-pro';
 
 /** 
  * Use Gemini-pro model for summarization
  */
 const useGemini = async (prompt) => {
+    const generationConfig = {
+        // stopSequences: ["red"],
+        maxOutputTokens: ChunkSize,
+        temperature: 0.1,
+        // topP: 0.1,
+        // topK: 16,
+    };
     requests++;
-    return await gemini.generateContent(prompt);
+    return await gemini.generateContent(prompt, generationConfig);
 };
 
 /** 
  * Use chatGPT model for summarization
  */
 const useChatGPT = async (prompt) => {
-    requests++;
     const messages = [
         { 'role': 'user', 'content': prompt },
     ];
     const config = {
         model: 'gpt-3.5-turbo-1106',
         max_tokens: ChunkSize,
-        temperature: 1,
+        temperature: 0.1,
     };
 
     const response = await openai.chatCompletion(
         messages,
         config,
     );
+    requests++;
     return response;
 };
 
@@ -41,25 +49,28 @@ const useChatGPT = async (prompt) => {
  * @param {String} model The name of the model to be used for summarisation. 
  * @returns 
  */
-const summariseChunk = async (chunk, maxWords, model = 'gemini-pro') => {
+const summariseChunk = async (chunk, maxWords, model = currentModel) => {
     console.log('[*] Summarising chunk');
 
     let condition = '';
     if (maxWords) {
-        condition = ` con una extesión de ${maxWords} palabras`;
+        condition = `El resumen debe tener una extensión final de ${maxWords} palabras.`;
     }
 
     try {
-        const prompt = `Haz un resumen del siguiente texto${condition}: \n"""${chunk}"""\n Identifica las ideas principales, organiza y desarrolla el contenido de modo que sea fácil de leer y comprender. Evita mencionar "El texto se trata de..." y despliega directamente la información en formato markdown`;
+        const prompt = `Analiza el siguiente texto y has un resumen conservando la estructura original del texto (con encabezados y su contenido). Conserva las ideas principales en cada subtema. El resumen debe ser lo más fiel posible a la información principal manteniendo la coherencia y el orden de los temas. Escribe el sesumen en formato markdown. ${condition}\n
+        Texto:\n"""${chunk}"""`;
         let response = '';
 
         switch (model) {
         case 'gpt-3.5-turbo-1106':
+            console.log('[>>] Using gpt-3.5-turbo-1106');
             response = await useChatGPT(prompt);
             break;
         case 'gemini-pro':
+            console.log('[>>] Using gemini-pro');
             response = await useGemini(prompt);
-            break;  // Asegúrate de agregar este break para evitar la ejecución del siguiente caso accidentalmente
+            break;
         default:
             break;
         }
@@ -80,9 +91,8 @@ const summariseChunks = async (chunks) => {
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     const summarisedChunks = await Promise.all(chunks.map(async chunk => {
-        await delay(200);
+        await delay(500);
         return await summariseChunk(chunk);
-
     }));
 
     const conncatText = summarisedChunks.join(' ');
@@ -100,22 +110,22 @@ const splitSentence = (sentence, maxChunkSize) => {
     console.log('[*] Splitting sentence');
 
     const sentenceChunks = [];
-    let patialChunk = '';
+    let partialChunk = '';
     const words = sentence.split(' ');
 
     words.forEach((word) => {
 
-        if (calculateTokens(patialChunk + word) < maxChunkSize) {
-            patialChunk += word + '.';
+        if (calculateTokens(partialChunk + word) < maxChunkSize) {
+            partialChunk += word + '.';
         } else {
-            sentenceChunks.push(patialChunk.trim());
-            patialChunk = word + '.';
+            sentenceChunks.push(partialChunk.trim());
+            partialChunk = word + '.';
         }
 
     });
 
-    if (patialChunk) {
-        sentenceChunks.push(patialChunk.trim());
+    if (partialChunk) {
+        sentenceChunks.push(partialChunk.trim());
     }
     return sentenceChunks;
 };
@@ -127,7 +137,6 @@ const splitSentence = (sentence, maxChunkSize) => {
  * @returns An array of strings, each string representing a chunk of text to be summarised.
  */
 const splitTextIntoChunks = (text, maxChunkSize) => {
-    console.log('[*] Splitting pdf text into chunks');
 
     const chunks = [];
     let currentChunk = '';
@@ -145,12 +154,13 @@ const splitTextIntoChunks = (text, maxChunkSize) => {
         } else {
             chunks.push(currentChunk.trim());
             currentChunk = sentence + '.';
+            console.log(`Chunk: ${chunks.length} ready`);
         }
-
     });
 
     if (currentChunk) {
         chunks.push(currentChunk.trim());
+        console.log(`Chunk: ${chunks.length} ready`);
     }
     return chunks;
 };
@@ -165,23 +175,25 @@ const calculateTokens = (text) => encode(text).length;
  * @returns 
  */
 const textSummariser = async (text, maxWords, model) => {
+    currentModel = model;
+
+    console.log('[*] PDF Size (tokens): ', calculateTokens(text));
 
     let summarisedText = text;
 
+    console.log('[*] Splitting pdf text into chunks');
     while (calculateTokens(summarisedText) > ChunkSize) {
         const textChunks = splitTextIntoChunks(summarisedText, ChunkSize);
         summarisedText = await summariseChunks(textChunks);
     }
-
-    console.log('[*] Summary done');
     console.log('[*] Generating summarised response');
-    console.log('PDF Size (tokens): ', calculateTokens(text));
-    console.log('AI Requests:', requests);
+
+    const response = await summariseChunk(summarisedText, maxWords, currentModel);
+
+    console.log('[>>] AI Requests:', requests);
     requests = 0;
-
-    return await summariseChunk(summarisedText, maxWords, model);
+    return response;
 };
-
 
 module.exports = {
     textSummariser,

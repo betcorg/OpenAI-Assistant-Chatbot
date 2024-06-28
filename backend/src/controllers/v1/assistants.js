@@ -1,6 +1,6 @@
 const openai = require('../../services/openai');
 const User = require('../../database/schema/user-schema');
-const {getAssistantResponse} = require('../../chatbots/assistants/gpt-assistants');
+const {getAssistantResponse} = require('../../modules/chatbots/assistants/gpt-assistants');
 
 const listAssistants = async (res) => {
 

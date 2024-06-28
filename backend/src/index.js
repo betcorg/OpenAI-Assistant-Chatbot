@@ -1,6 +1,6 @@
 require('dotenv').config();
-const mongoConnection = require('./src/database/mongoConnect');
-const expressApp = require('./src/server/app');
+const mongoConnection = require('./database/mongoConnect');
+const expressApp = require('./server/app');
 
 const main = async () => {
 
