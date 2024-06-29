@@ -1,8 +1,8 @@
-const OpenAI = require('openai');
-const openai = new OpenAI();
-const fs = require('fs');
-const {errorLog} = require('../utils/errorHandler');
+import OpenAI from 'openai';
+import fs from 'fs';
+import { errorLog } from '../utils/errorHandler.js';
 
+const openai = new OpenAI(); 
 
 
 /*/////////////////////////////// CHAT COMPLETION/////////////////////////////////*/
@@ -407,7 +407,7 @@ const fileman = {
 
 
 
-module.exports = {
+export {
     chatCompletion,
     createEmbedding,
     threads,

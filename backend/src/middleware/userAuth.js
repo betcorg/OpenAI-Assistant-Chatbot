@@ -1,7 +1,7 @@
-const User = require('../database/schema/user-schema');
-const { verifyPass } = require('../utils/secManager');
+import User from '../database/schema/user-schema.js';
+import { verifyPass } from '../utils/secManager.js';
 
-const userAuth = async (req, res, next) => {
+export const userAuth = async (req, res, next) => {
 
     const { email, password } = req.body;
 
@@ -40,5 +40,3 @@ const userAuth = async (req, res, next) => {
         console.log(error);
     }
 };
-
-module.exports = { userAuth };

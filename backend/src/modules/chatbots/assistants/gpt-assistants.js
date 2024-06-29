@@ -1,16 +1,12 @@
-require('dotenv/config');
 
 
 
 
-const getAssistantResponse = async () => {
+
+export const getAssistantResponse = async () => {
 
 
 
-};
-
-module.exports = {
-    getAssistantResponse,
 };
 
 

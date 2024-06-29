@@ -1,49 +1,41 @@
-const express = require('express');
-const router = express.Router();
+import path from 'path';
+import multer from 'multer';
+import express from 'express';
+import { userAuth} from '../middleware/userAuth.js';
+import { login, logout, signup } from '../controllers/v1/userAccess.js';
+import { verifyToken } from '../middleware/verifyToken.js';
+import { pdfSummary } from '../controllers/v1/pdfSummary.js';
+import { profile } from '../controllers/v1/appRoutes.js';
+import { deleteUser, getUserById, getUsers, updateUser } from '../controllers/v1/users.js';
+import { fileURLToPath } from 'url';
+import { createNewAssistant, deleteAssistantById, getAssistantById, listAssistants, updateAssistantById, useAssistant } from '../controllers/v1/assistants.js';
 
-const authController = require('../controllers/v1/userAccess');
-const { userAuth } = require('../middleware/userAuth');
-router
-    .post('/signup', authController.signup)
-    .post('/login', userAuth, authController.login)
-    .post('/logout', authController.logout);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const upload = multer({ dest: path.join(__dirname, '../../pdfsummary') }); 
 
+export const router = express.Router()
 
-const routesController = require('../controllers/v1/appRoutes');
-const { verifyToken } = require('../middleware/verifyToken');
-router
-    .get('/profile', verifyToken, routesController.profile);
-
-
-const usersController = require('../controllers/v1/users');
-router
-    .get('/users', usersController.getUsers)
-    .get('/users/:id', usersController.getUserById)
-    .put('/users/:id', usersController.updateUser)
-    .delete('/users/:id', usersController.deleteUser);
+    .post('/signup', signup)
+    .post('/login', userAuth, login)
+    .post('/logout', logout)
 
 
-const assistsController = require('../controllers/v1/assistants');
-router
-    .get('/assistants/list', assistsController.listAssistants)
-    .get('/assistants/retrieve', assistsController.getAssistantById)
-    .post('/assistants/create', assistsController.createNewAssistant)
-    .put('/assistants/update', assistsController.updateAssistantById)
-    .delete('/assistants/delete', assistsController.deleteAssistantById)
-
-    .post('/assistants/use', assistsController.useAssistant);
+    .get('/profile', verifyToken, profile)
 
 
-
-const path = require('path');
-const multer = require('multer');
-const upload = multer({ dest: path.join(__dirname, '../../pdfsummary') });
-const { pdfSummary } = require('../controllers/v1/pdfSummary');
-
-router.post('/pdfsummary', upload.single('pdf'), pdfSummary);
+    .get('/users', getUsers)
+    .get('/users/:id', getUserById)
+    .put('/users/:id', updateUser)
+    .delete('/users/:id', deleteUser)
 
 
+    .get('/assistants/list', listAssistants)
+    .get('/assistants/retrieve', getAssistantById)
+    .post('/assistants/create', createNewAssistant)
+    .put('/assistants/update', updateAssistantById)
+    .delete('/assistants/delete', deleteAssistantById)
+    .post('/assistants/use', useAssistant)
 
-module.exports = { router };
-
+    .post('/pdfsummary', upload.single('pdf'), pdfSummary);
 

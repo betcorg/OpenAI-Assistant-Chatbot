@@ -1,11 +1,11 @@
-const { PDFExtract } = require('pdf.js-extract');
+import { PDFExtract } from 'pdf.js-extract';
 
 /**
  * 
  * @param {String} filepath The path of the pdf file you want to extraxt text from.
  * @returns A string with the whole text extracted from the pdf file.
  */
-const pdfTextExtractor = async (filepath) =>{
+export const pdfTextExtractor = async (filepath) =>{
 
     const pdfExtract = new PDFExtract();
     const extractOptions = {
@@ -21,8 +21,4 @@ const pdfTextExtractor = async (filepath) =>{
     const data =  await pdfExtract.extract(filepath, extractOptions);
 
     return data.pages.map(page => page.content.map(item => item.str).join(' ')).join(' ');
-};
-
-module.exports = {
-    pdfTextExtractor,
 };

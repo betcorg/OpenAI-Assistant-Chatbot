@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const JWT_SECRET = process.env.JWT_SECRET;
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const signJWT = (payload) => {
     return new Promise((resolve, reject) => {
@@ -36,9 +36,7 @@ const verifyPass = async (password, hash) => {
     return await bcrypt.compare(password, hash);
 };
 
-
-
-module.exports = {
+export {
     signJWT,
     verifyJWT,
     hashPassword,

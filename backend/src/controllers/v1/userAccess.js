@@ -1,8 +1,8 @@
-const User = require('../../database/schema/user-schema');
-const { signJWT, hashPassword } = require('../../utils/secManager');
 
-const signup = async (req, res) => {
+import User from '../../database/schema/user-schema.js';
+import { signJWT, hashPassword } from '../../utils/secManager.js';
 
+export const signup = async (req, res) => {
     try {
         let role = '';
         const { username, email, password } = req.body;
@@ -30,7 +30,6 @@ const signup = async (req, res) => {
             });
 
     } catch (error) {
-
         if (error && error.code === 11000) {
             res.status(400).json({
                 message: 'User already registered, login instead',
@@ -46,13 +45,11 @@ const signup = async (req, res) => {
     }
 };
 
-const login = async (req, res) => {
-
+export const login = async (req, res) => {
     try {
         const { _id, username, email, role, assistants } = req.user;
 
         if (req.user && _id) {
-
             const token = await signJWT({ id: _id });
 
             res.cookie('token', token)
@@ -67,7 +64,6 @@ const login = async (req, res) => {
                     }
                 });
         }
-
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -76,7 +72,7 @@ const login = async (req, res) => {
     }
 };
 
-const logout = (req, res) => {
+export const logout = (req, res) => {
     res.cookie('token', '', {
         expires: new Date(0),
     });
@@ -85,8 +81,3 @@ const logout = (req, res) => {
     });
 };
 
-module.exports = {
-    signup,
-    login,
-    logout,
-};

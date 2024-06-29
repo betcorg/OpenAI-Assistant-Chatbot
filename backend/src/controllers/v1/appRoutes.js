@@ -1,7 +1,7 @@
-const User = require('../../database/schema/user-schema');
+import User from '../../database/schema/user-schema.js';
 
 
-const profile = async (req, res) => {
+export const profile = async (req, res) => {
 
     const { id } = req.user_id;
 
@@ -17,5 +17,3 @@ const profile = async (req, res) => {
     res.status(200).json({ user_info });
 
 };
-
-module.exports = { profile };

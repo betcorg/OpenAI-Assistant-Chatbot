@@ -1,7 +1,7 @@
 // require('dotenv/config');
-const User = require('../../database/schema/user-schema');
+import User from '../../database/schema/user-schema.js';
 
-const getUsers = async (res) => {
+export const getUsers = async (res) => {
 
     try {
         const users = await User.find();
@@ -13,7 +13,7 @@ const getUsers = async (res) => {
     }
 };
 
-const getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
 
     try {
         const user = await User.findById(req.params.id);
@@ -28,7 +28,7 @@ const getUserById = async (req, res) => {
     }
 };
 
-const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
 
     try {
         const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -45,7 +45,7 @@ const updateUser = async (req, res) => {
     }
 };
 
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
 
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
@@ -58,11 +58,4 @@ const deleteUser = async (req, res) => {
         res.status(500).json({ message: error.message });
         console.error('Cannot delete user: ', error);
     }
-};
-
-module.exports = {
-    getUsers,
-    getUserById,
-    updateUser,
-    deleteUser
 };

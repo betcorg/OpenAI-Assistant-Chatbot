@@ -1,13 +1,8 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.G_API_KEY);
 
-/**
- *
- * @param {String} input
- * @returns {promise<string>}
- */
-async function generateContent(input, generationConfig) {
+export const generateContent = async (input, generationConfig) => {
     try {
         const model = genAI.getGenerativeModel(
             {
@@ -22,16 +17,10 @@ async function generateContent(input, generationConfig) {
     } catch (error) {
         console.error(`Error calling gemini.js - generateContent(): ${error.message}`, error);
     }
-}
+};
 
-/**
- *
- * @param {Array} chatHistory
- * @param {Object} chatConfig
- * @param {String} input
- * @returns {promise<string>}
- */
-async function createChat(chatHistory, generationConfig, input) {
+
+export const createChat = async (chatHistory, generationConfig, input) => {
 
     try {
         const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
@@ -48,9 +37,5 @@ async function createChat(chatHistory, generationConfig, input) {
         console.error(`Error calling gemini.js - createChat(): ${error.message}`, error);
     }
 
-}
-
-module.exports = {
-    generateContent,
-    createChat,
 };
+

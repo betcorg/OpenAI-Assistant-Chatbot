@@ -1,9 +1,9 @@
 
-const {pdfTextExtractor} = require('../../services/pdfTextExtractor');
-const {textSummariser} = require('../../modules/textSummariser');
+import { pdfTextExtractor } from '../../services/pdfTextExtractor.js';
+import { textSummariser } from '../../modules/textSummariser.js';
+ 
 
-
-const pdfSummary = async (req, res) => {
+export const pdfSummary = async (req, res) => {
 
     try {
         const { maxWords, model} = req.body;
@@ -27,6 +27,4 @@ const pdfSummary = async (req, res) => {
     }
 };
 
-module.exports = {
-    pdfSummary,
-};
+

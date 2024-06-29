@@ -1,9 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const { router } = require('../routes');
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import { router } from '../routes/index.js'; // Asegúrate que la ruta sea correcta
+
 const PORT = process.env.PORT;
 
 const expressApp = () => {
@@ -21,4 +22,4 @@ const expressApp = () => {
     });
 };
 
-module.exports = expressApp;
+export default expressApp; 

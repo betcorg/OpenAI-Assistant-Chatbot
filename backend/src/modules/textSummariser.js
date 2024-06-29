@@ -1,6 +1,7 @@
-const { encode } = require('gpt-3-encoder');
-const openai = require('../services/openai');
-const gemini = require('../services/gemini');
+import { encode } from 'gpt-3-encoder';
+import * as openai from '../services/openai.js';
+import * as gemini from '../services/gemini.js';
+
 
 let requests = 0;
 const ChunkSize = 4000;
@@ -9,7 +10,7 @@ let currentModel = 'gemini-pro';
 /** 
  * Use Gemini-pro model for summarization
  */
-const useGemini = async (prompt) => {
+export const useGemini = async (prompt) => {
     const generationConfig = {
         // stopSequences: ["red"],
         maxOutputTokens: ChunkSize,
@@ -24,7 +25,7 @@ const useGemini = async (prompt) => {
 /** 
  * Use chatGPT model for summarization
  */
-const useChatGPT = async (prompt) => {
+export const useChatGPT = async (prompt) => {
     const messages = [
         { 'role': 'user', 'content': prompt },
     ];
@@ -49,7 +50,7 @@ const useChatGPT = async (prompt) => {
  * @param {String} model The name of the model to be used for summarisation. 
  * @returns 
  */
-const summariseChunk = async (chunk, maxWords, model = currentModel) => {
+export const summariseChunk = async (chunk, maxWords, model = currentModel) => {
     console.log('[*] Summarising chunk');
 
     let condition = '';
@@ -87,7 +88,7 @@ const summariseChunk = async (chunk, maxWords, model = currentModel) => {
  * @param {Array} chunks An array of strings, each string representing a chunk of text to be summarised.
  * @returns A String with all the chunks summarised together.
  */
-const summariseChunks = async (chunks) => {
+export const summariseChunks = async (chunks) => {
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     const summarisedChunks = await Promise.all(chunks.map(async chunk => {
@@ -106,7 +107,7 @@ const summariseChunks = async (chunks) => {
  * @param {Number} maxChunkSize A number that represents the max tokens in the chunk
  * @returns An array of strings, each string representing a chunk of text to be summarised.
  */
-const splitSentence = (sentence, maxChunkSize) => {
+export const splitSentence = (sentence, maxChunkSize) => {
     console.log('[*] Splitting sentence');
 
     const sentenceChunks = [];
@@ -136,7 +137,7 @@ const splitSentence = (sentence, maxChunkSize) => {
  * @param {Number} maxChunkSize An integer that indicates the max tokens in the chunk
  * @returns An array of strings, each string representing a chunk of text to be summarised.
  */
-const splitTextIntoChunks = (text, maxChunkSize) => {
+export const splitTextIntoChunks = (text, maxChunkSize) => {
 
     const chunks = [];
     let currentChunk = '';
@@ -165,7 +166,7 @@ const splitTextIntoChunks = (text, maxChunkSize) => {
     return chunks;
 };
 
-const calculateTokens = (text) => encode(text).length;
+export const calculateTokens = (text) => encode(text).length;
 
 /**
  * 
@@ -174,7 +175,7 @@ const calculateTokens = (text) => encode(text).length;
  * @param {String} model The model to be used for summarisation.
  * @returns 
  */
-const textSummariser = async (text, maxWords, model) => {
+export const textSummariser = async (text, maxWords, model) => {
     currentModel = model;
 
     console.log('[*] PDF Size (tokens): ', calculateTokens(text));
@@ -193,8 +194,4 @@ const textSummariser = async (text, maxWords, model) => {
     console.log('[>>] AI Requests:', requests);
     requests = 0;
     return response;
-};
-
-module.exports = {
-    textSummariser,
 };
