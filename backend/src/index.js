@@ -1,10 +1,9 @@
 import 'dotenv/config';
-import {connectDatabase} from './database/mongoConnect.js'; 
-import expressApp from './server/app.js'; 
+import server from './server/app.js'; 
 
 const main = async () => {
-    await connectDatabase();
-    expressApp();
+    await server.connectDB();
+    server.start();
 };
 
-main();
+await main();
