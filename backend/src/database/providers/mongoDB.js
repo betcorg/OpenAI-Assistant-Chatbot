@@ -1,17 +1,19 @@
 import mongoose from 'mongoose';
 
-class MongoDB {
+export default class MongoDB {
 
-  async connect(uri) {
-
-    try {
-      await mongoose.connect(uri);
-      console.log('\n[*] Connected to MongoDB');
-    } catch (error) {
-      console.error('\n[!] Error connecting to MongoDB:', error);
-      process.exit(1);
+    constructor(uri) {
+        this.uri = uri;
     }
-  }
-}
 
-export default new MongoDB();
+    async connect() {
+
+        try {
+            await mongoose.connect(this.uri);
+            console.log('\n[*] Mongoose: Connected to MongoDB');
+        } catch (error) {
+            console.error('\n[!] Mongoose: Error connecting to MongoDB:', error);
+            process.exit(1);
+        }
+    }
+}

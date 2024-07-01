@@ -4,21 +4,15 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
-import { router } from '../routes/index.js'; 
-import { configs } from '../configs/index.js';
-import Database from '../database/connection/index.js';
-import MongoDB from '../database/providers/mongoDB.js';
+const v = ':remote-addr - :remote-user [:date[web]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :response-time ms';
 
-const dbProvider = new Database(MongoDB, configs.MONGO_URI);
+export default class Server {
 
-class Server {
-
-    constructor(configs, dbProvider, router,) {
+    constructor({port, dbProvider, routes}) {
         this.app = express();
-        this.configs = configs;
         this.dbProvider = dbProvider;
-        this.router = router;
-        this.port = configs.PORT;
+        this.routes = routes;
+        this.port = port;
     }
 
     async connectDB() {
@@ -31,13 +25,16 @@ class Server {
             .use(cors())
             .use(bodyParser.json())
             .use(cookieParser())
-            .use(morgan('dev'))
+            .use(morgan(v));
 
-            .use('/api/v1', this.router)
-            .listen(this.port, () => {
+            for (const route of this.routes) {
+                this.app.use(route[0], route[1]);
+            }
+
+            this.app.listen(this.port, () => {
                 console.log(`[*] Server listening at port ${this.port}`);
             });
     }
+
 }
 
-export default new Server(configs, dbProvider, router);

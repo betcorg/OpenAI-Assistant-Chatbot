@@ -1,4 +1,4 @@
-import User from '../database/schema/user-schema.js';
+import User from '../database/models/user-schema.js';
 import { verifyPass } from '../utils/secManager.js';
 
 export const userAuth = async (req, res, next) => {

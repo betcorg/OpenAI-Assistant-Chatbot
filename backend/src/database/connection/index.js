@@ -1,14 +1,13 @@
 
-class Database {
+class DatabaseProvider {
 
-  constructor(provider, uri) {
-    this.provider = provider;
-    this.uri = uri;
-  }
+    constructor(provider) {
+        this.provider = provider;
+    }
 
-  async connect() {
-    await this.provider.connect(this.uri);
-  }
+    async connect() {
+        await this.provider.connect();
+    }
 }
 
-export default Database;
+export default DatabaseProvider;
