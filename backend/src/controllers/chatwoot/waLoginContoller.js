@@ -1,27 +1,49 @@
 import { whatsapp } from '../../services/baileys.js'
+import { io } from '../../index.js';
+import qrcode from 'qrcode';
+
 
 export const whatsappLoginController = async (req, res) => {
-
-
-    await whatsapp.login( async (update) => {
-
-        try {
-            const { connection, lastDisconnect, qr } = update;
     
-            if (connection === 'close') {
-                console.log('Connection closed');
-                await whatsapp.connectionKeeper(lastDisconnect);
-    
-            } else if (connection === 'open') {
-                console.log('[*] Connection opened');
-                res.status(200).json({status: 'connected'})
+    try {
+        if (req?.query?.login) {
+            
+            await whatsapp.login(async (update) => {
                 
-            } else if (qr) {
-                console.log('[*] QR Code:', qr);
-                res.status(200).json({status: 'connected', qr: qr})
-            }
-        } catch (error) {
-            res.status(500).json({status: 'error', description: error})
+                const { connection, lastDisconnect, qr } = update;
+                
+                if (connection === 'close') {
+                    console.log('Connection closed');
+                    await whatsapp.connectionKeeper(lastDisconnect);
+
+                } else if (connection === 'open') {
+                    console.log('[*] Connection opened');
+                    
+                } else if (qr) {
+                    console.log('==> Generando qr url');
+                    console.log({ update });
+                    
+                    qrcode.toDataURL(qr, async (error, url) => {
+                        io.emit('qr', url);
+                    });
+                }
+            });
+            
+        } else {
+            console.log(req.query);
+            const root = process.cwd();
+            res.status(200).sendFile(`${root}/qr.ui/index.html`);
+
         }
-    });
+
+
+    } catch (error) {
+        res.status(500).json({ status: 'error', description: error })
+    }
+
 }
+
+
+
+
+

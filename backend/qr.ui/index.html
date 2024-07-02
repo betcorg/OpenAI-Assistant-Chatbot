@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            background-color: #edecfa;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .container {
+            font-family: Helvetica, sans-serif;
+            width: 100%;
+            height: 100vh;
+            text-align: center;
+            display: flex;
+        }
+
+        .qr-container {
+            background-color: #ffff;
+            width: 400px;
+            height: 400px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgb(205, 205, 205);
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .qr-card {
+            width: 100%;
+        }
+
+        h1 {
+            padding-top: 0;
+            font-size: 25px;
+        }
+
+        img {
+            width: 250px;
+            height: 250px;
+            margin: auto;
+            display: none;
+        }
+
+        .icon {
+            width: 100px;
+            height: 100px;
+            display: block;
+        }
+
+        p {
+            font-size: 14px;
+        }
+
+        button {
+            background: #0acb57;
+            border: none;
+            border-radius: 3px;
+            box-shadow: 1px 1px 5px #7d7d7d;
+            font-size: 20px;
+            color: #ffff;
+            width: 80%;
+            height: 50px;
+        }
+
+        button:hover {
+            background: #09bd51;
+            border: none;
+            border-radius: 3px;
+            box-shadow: 1px 1px 5px #7d7d7d;
+            font-size: 21px;
+            color: #ffff;
+            width: 81%;
+            height: 54px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="qr-container">
+            <div class="qr-card">
+                <img src="./assets/whatsapp.png" alt="WhatsApp icon" id="icon" class="icon">
+                <h1 id="heading">Inicia Sesión en tu Cuenta de WhatsApp</h1>
+                <img src="" alt="loader" id="qr">
+                <button id="button">Iniciar Sesión</button>
+                <p id="text"></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    const img = document.getElementById('qr');
+    const button = document.getElementById('button');
+    const text = document.getElementById('text');
+    const heading = document.getElementById('heading');
+    const icon = document.getElementById('icon');
+
+    button.addEventListener('click', () => {
+        fetch('http://localhost:3002/chatwoot/wa-login?login=start');
+        button.style.display = 'none';
+    });
+
+    socket.on('qr', url => {
+        console.log({ url });
+        img.setAttribute('src', url);
+        heading.innerHTML = 'WhatsApp QR Code';
+        text.innerHTML = 'Escanea el código QR con tu aplicación de WhatsApp'
+        img.style.display = 'block';
+        icon.style.display = 'none';
+    });
+</script>
+
+</html>
