@@ -1,5 +1,5 @@
 
-import User from '../../database/models/user-schema.js';
+import User from '../../database/models/userModel.js';
 import { signJWT, hashPassword } from '../../utils/secManager.js';
 
 export const signup = async (req, res) => {

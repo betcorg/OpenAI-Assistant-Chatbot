@@ -1,5 +1,5 @@
 // require('dotenv/config');
-import User from '../../database/models/user-schema.js';
+import User from '../../database/models/userModel.js';
 
 export const getUsers = async (req, res) => {
 

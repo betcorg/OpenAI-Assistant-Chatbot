@@ -111,6 +111,7 @@
     button.addEventListener('click', () => {
         fetch('http://localhost:3002/chatwoot/wa-login?login=start');
         button.style.display = 'none';
+        img.setAttribute('src', './assets/loader.gif');
     });
 
     socket.on('qr', url => {

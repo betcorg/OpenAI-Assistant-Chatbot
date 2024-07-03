@@ -8,18 +8,34 @@ const openai = new OpenAI();
 /*/////////////////////////////// CHAT COMPLETION/////////////////////////////////*/
 
 
-
-const chatCompletion = async (messages, {
+/**
+ * Generates a chat completion using the OpenAI API.
+ *
+ * @async
+ * @param {Array<Object>} messages - An array of messages comprising the conversation history.
+ * @param {Object} [options] - Optional parameters for the chat completion.
+ * @param {number} [options.frequency_penalty=null] - Controls the model's tendency to repeat itself.
+ * @param {number} [options.max_tokens=250] - The maximum number of tokens to generate.
+ * @param {string} [options.model='gpt-3.5-turbo'] - The ID of the model to use.
+ * @param {number} [options.n=1] - The number of chat completion choices to generate.
+ * @param {string|Array<string>} [options.stop=null] - A sequence or array of sequences where the API will stop generating further tokens.
+ * @param {boolean} [options.stream=null] - Whether to stream back partial progress.
+ * @param {number} [options.temperature=1] - Controls the randomness of the model's output.
+ * @param {number} [options.top_p=null] - Controls the diversity of the model's output.
+ * @returns {Promise<string>} The content of the generated chat completion.
+ * @throws {Error} If there is an error creating the chat completion.
+ */
+export const createChatCompletion = async (messages, {
     frequency_penalty = null,
     max_tokens = 250,
-    model = 'gpt-3.5-turbo-1106',
+    model = 'gpt-3.5-turbo',
     n = 1,
     stop = null,
     stream = null,
     temperature = 1,
     top_p = null,
 
-}) => {
+} = {}) => {
     const params = {
         messages: messages,
         frequency_penalty,
@@ -42,6 +58,7 @@ const chatCompletion = async (messages, {
         throw error;
     }
 };
+
 
 /*/////////////////////////////////////// EMBEDDINGS ///////////////////////////////////////*/
 
@@ -394,7 +411,6 @@ const fileman = {
 
 
 export {
-    chatCompletion,
     createEmbedding,
     threads,
     messages,

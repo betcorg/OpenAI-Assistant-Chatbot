@@ -1,5 +1,5 @@
 import * as openai from '../../services/openai.js';
-import User from '../../database/models/user-schema.js';
+import User from '../../database/models/userModel.js';
 import { getAssistantResponse } from '../../modules/chatbots/assistants/gpt-assistants.js';
 
 export const listAssistants = async (req, res) => {
